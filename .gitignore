@@ -1,3 +1,7 @@
+independentSimulation
+powerSimulation
+calculateVariance
+
 # Compiled Object files
 *.slo
 *.lo
