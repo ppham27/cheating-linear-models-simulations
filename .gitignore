@@ -1,6 +1,7 @@
 independentSimulation
 powerSimulation
 calculateVariance
+testBalance
 
 # Compiled Object files
 *.slo

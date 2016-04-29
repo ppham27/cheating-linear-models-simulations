@@ -37,9 +37,9 @@ int main(int argc, char *argv[]) {
   normal_distribution<double> normalMean1(1, standardDeviation);  
 
   // store and print results
-  vector<tuple<double, double, int, int>> results(ITERATIONS); // p value, beta, set size, subset size
+  vector<tuple<double, double, int, int, double>> results(ITERATIONS); // p value, beta, set size, subset size
   cout << setprecision(12) << fixed;
-  cout << "N\tpower\tp.value\tbeta\tset.size\tsubset.size" << endl;
+  cout << "2N\tpower\tp.value\tbeta\tset.size\tsubset.size" << endl;
   // randomly assign treatment
   vector<int> X(2*N); 
   for (int i = 0; i < N; ++i) X[i] = 1;  

@@ -28,9 +28,9 @@ int main(int argc, char *argv[]) {
   normal_distribution<double> normalMean0(0, sigma);
 
   // store and print results
-  vector<tuple<double, double, int, int>> results(ITERATIONS); // p value, beta, set size, subset size
+  vector<tuple<double, double, int, int, double>> results(ITERATIONS); // p value, beta, set size, subset size, balance p-value
   cout << setprecision(12) << fixed;
-  cout << "N\tp.value\tbeta\tset.size\tsubset.size" << endl;
+  cout << "2N\tp.value\tbeta\tset.size\tsubset.size\tbalance.p.value" << endl;
 
   // randomly assign treatment
   vector<int> X(2*N); 
@@ -46,7 +46,8 @@ int main(int argc, char *argv[]) {
          << get<0>(results[i]) << '\t' 
          << get<1>(results[i]) << '\t' 
          << get<2>(results[i]) << '\t' 
-         << get<3>(results[i]) << endl;
+         << get<3>(results[i]) << '\t'
+         << get<4>(results[i]) << endl;
   }
 
   double duration = (clock() - startTime) / (double) CLOCKS_PER_SEC;

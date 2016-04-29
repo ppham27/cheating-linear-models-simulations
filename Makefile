@@ -13,3 +13,6 @@ powerSimulation: simulate
 
 calculateVariance: simulate
 	g++ $(CPPFLAGS) -o calculateVariance calculateVariance.cpp simulate.o -larmadillo
+
+testBalance: simulate
+	g++ $(CPPFLAGS) -o testBalance testBalance.cpp simulate.o -larmadillo
