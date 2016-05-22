@@ -70,18 +70,6 @@ pair<double, double> calculateBetaPValue(const arma::mat &Z, const arma::Col<dou
     double s = arma::norm(Y - Z*beta)/sqrt(df); // sample standard deviation
     double standardDeviation = s*sqrt(inverseFirstColumn(0));
     double t = abs(beta(0))/standardDeviation;  
-    // alternative t statistic calculation
-    // if (Z.n_cols == 2) {
-    //   cout << "****" << endl;
-    //   double a = arma::dot(Z.col(0), Y)*arma::dot(Z.col(1), Z.col(1)) - arma::dot(Z.col(0), Z.col(1))*arma::dot(Y, Z.col(1));
-    //   double b = arma::dot(Z.col(1), Z.col(1))*arma::dot(Z.col(0), Z.col(0))-arma::dot(Z.col(0), Z.col(1))*arma::dot(Z.col(0), Z.col(1));
-    //   cout << beta(0) << endl;
-    //   cout << a/b << endl;
-    //   cout << "-----" << endl;
-    //   cout << t << endl;
-    //   cout << a/sqrt(b*arma::dot(Z.col(1), Z.col(1)))/s << endl;
-    //   cout << s << endl;
-    // }
     boost::math::students_t tDist(df);
     return make_pair(2*cdf(tDist, -t), beta(0));
   }
@@ -112,7 +100,10 @@ tuple<double, double, int, int, double, double> simulate(const arma::Col<double>
   } else {                    // need more covariates
     bool done = false;
     int smallestSubsetSize = INT_MAX;
-    for (int j = 1; j < N - 2 || (j == N - 2 && !interceptTerm); ++j) { // add covariates one-by-one
+    /* add covariates one-by-one, we always include the treatment
+     * if we're using the intercept two covariates are included by default
+     */
+    for (int j = 1; j < N - 2 || (j == N - 2 && !interceptTerm); ++j) { 
       for (int k = 0; k < N; ++k) Z(k, j) = bernoulli(rng);
       if (!interceptTerm) {
         while (arma::rank(Z) <= j) {
@@ -123,7 +114,7 @@ tuple<double, double, int, int, double, double> simulate(const arma::Col<double>
           for (int k = 0; k < N; ++k) Z(k, j) = bernoulli(rng);
         }        
       }
-      for (int k = j; k >= 1; --k) { // loop through subset sizes
+      for (int k = j; k >= 1; --k) { // loop through subset sizes, k is the number of additional covariates
         pair<double, double> newPValue;
         if (k == j) {           // use all available covariates
           bestColumns.emplace_back(bestColumns.back().n_rows + 1); // add one more to biggest subset

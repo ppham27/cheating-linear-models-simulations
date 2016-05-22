@@ -32,7 +32,8 @@ int main(int argc, char *argv[]) {
   
   // set up generators
   random_device randomDevice;
-  mt19937_64 rng; rng.seed(randomDevice());
+  mt19937_64 rng; 
+  rng.seed(randomDevice());
   normal_distribution<double> normalMean0(0, standardDeviation);  
   normal_distribution<double> normalMean1(1, standardDeviation);  
 
