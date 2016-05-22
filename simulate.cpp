@@ -70,58 +70,97 @@ pair<double, double> calculateBetaPValue(const arma::mat &Z, const arma::Col<dou
     double s = arma::norm(Y - Z*beta)/sqrt(df); // sample standard deviation
     double standardDeviation = s*sqrt(inverseFirstColumn(0));
     double t = abs(beta(0))/standardDeviation;  
+    // alternative t statistic calculation
+    // if (Z.n_cols == 2) {
+    //   cout << "****" << endl;
+    //   double a = arma::dot(Z.col(0), Y)*arma::dot(Z.col(1), Z.col(1)) - arma::dot(Z.col(0), Z.col(1))*arma::dot(Y, Z.col(1));
+    //   double b = arma::dot(Z.col(1), Z.col(1))*arma::dot(Z.col(0), Z.col(0))-arma::dot(Z.col(0), Z.col(1))*arma::dot(Z.col(0), Z.col(1));
+    //   cout << beta(0) << endl;
+    //   cout << a/b << endl;
+    //   cout << "-----" << endl;
+    //   cout << t << endl;
+    //   cout << a/sqrt(b*arma::dot(Z.col(1), Z.col(1)))/s << endl;
+    //   cout << s << endl;
+    // }
     boost::math::students_t tDist(df);
     return make_pair(2*cdf(tDist, -t), beta(0));
   }
 }
 
-tuple<double, double, int, int, double> simulate(const arma::Col<double> &Y, const vector<int> X, 
-                                                 double sigma, bool varianceKnown,
-                                                 arma::mat &Z, mt19937_64 &rng) {
+tuple<double, double, int, int, double, double> simulate(const arma::Col<double> &Y, const vector<int> X, 
+                                                         double sigma, bool varianceKnown,
+                                                         arma::mat &Z, mt19937_64 &rng,
+                                                         bool interceptTerm) {
   bernoulli_distribution bernoulli(0.5);
   int N = X.size();
   Z.fill(0);
-  copy(X.begin(), X.end(), Z.begin_col(0));
-  vector<arma::uvec> bestColumns{arma::uvec{0}}; bestColumns.reserve(N - 1);  
+  // bestColumns[k] keeps track of the k + 1 or k + 2 columns that produce the smallest p-value depending on interceptTerm
+  vector<arma::uvec> bestColumns; bestColumns.reserve(N - 1); 
+  if (interceptTerm) { // make intercept term last column of Z
+    fill(Z.begin_col(N - 1), Z.end_col(N - 1), 1);
+    copy(X.begin(), X.end(), Z.begin_col(0));
+    bestColumns.push_back(arma::uvec{0, (unsigned long long) N - 1ULL}); 
+  } else {
+    copy(X.begin(), X.end(), Z.begin_col(0));
+    bestColumns.push_back(arma::uvec{0});     
+  }  
+  // bestPValues[k] corresponds to p-value if the columns bestColumns[k] are used
   vector<pair<double, double>> bestPValues; bestPValues.reserve(N - 1);
   bestPValues.push_back(calculateBetaPValue(Z.cols(bestColumns.front()), Y, sigma, varianceKnown));
   if (bestPValues.front().first <= 0.05) {
-    return make_tuple(bestPValues.front().first, bestPValues.front().second, 0, 0, -1);
+    return make_tuple(bestPValues.front().first, bestPValues.front().second, 0, 0, -1, bestPValues.front().first);
   } else {                    // need more covariates
     bool done = false;
     int smallestSubsetSize = INT_MAX;
-    for (int j = 1; j < N - 1; ++j) { // add covariates one-by-one
+    for (int j = 1; j < N - 2 || (j == N - 2 && !interceptTerm); ++j) { // add covariates one-by-one
       for (int k = 0; k < N; ++k) Z(k, j) = bernoulli(rng);
-      while (arma::rank(Z) <= j) {
-        for (int k = 0; k < N; ++k) Z(k, j) = bernoulli(rng);
-      }        
+      if (!interceptTerm) {
+        while (arma::rank(Z) <= j) {
+          for (int k = 0; k < N; ++k) Z(k, j) = bernoulli(rng);
+        }        
+      } else { // offset rank by 1 for intercept term
+        while (arma::rank(Z) <= j + 1) {
+          for (int k = 0; k < N; ++k) Z(k, j) = bernoulli(rng);
+        }        
+      }
       for (int k = j; k >= 1; --k) { // loop through subset sizes
         pair<double, double> newPValue;
-        if (k == j) {
-          bestColumns.emplace_back(j + 1);
-          for (int l = 0; l <= k; ++l) bestColumns.back()(l) = l;
-          newPValue = calculateBetaPValue(Z.cols(0, k), Y, sigma, varianceKnown);
+        if (k == j) {           // use all available covariates
+          bestColumns.emplace_back(bestColumns.back().n_rows + 1); // add one more to biggest subset
+          for (int l = 0; l < bestColumns.back().n_rows - 1; ++l) { 
+            bestColumns.back()(l) = bestColumns[j - 1](l); // copy over from original subset
+          }
+          bestColumns.back()(bestColumns.back().n_rows - 1) = j; // add new covariate
+          newPValue = calculateBetaPValue(Z.cols(bestColumns.back()), Y, sigma, varianceKnown);
           bestPValues.push_back(newPValue);
-        } else {
-          arma::uvec columnSubset(k + 1); 
-          for (int l = 0; l < k; ++l) columnSubset(l) = bestColumns[k - 1](l); 
-          columnSubset(k) = j;
+        } else {                // make a new subset of same size with new covariate
+          arma::uvec columnSubset(bestColumns[k].n_rows); 
+          for (int l = 0; l < columnSubset.n_rows - 1; ++l) 
+            columnSubset(l) = bestColumns[k - 1](l); // copy over from smaller subset
+          columnSubset(columnSubset.n_rows - 1) = j; // add new covariate
           newPValue = calculateBetaPValue(Z.cols(columnSubset), Y, sigma, varianceKnown);
-          if (bestPValues[k].first > newPValue.first) {
+          if (bestPValues[k].first > newPValue.first) { // if better subset replace
             bestPValues[k] = newPValue;
             bestColumns[k] = columnSubset;
           }
         }
-        if (newPValue.first <= 0.05) {
+        if (newPValue.first <= 0.05) { // stop when we reach significance
           done = true;
           smallestSubsetSize = k;
         }
       }
       if (done) {
-        double balancePValue = smallestSubsetSize == 1 ? testBalance(Z.col(bestColumns[1](1)), Z.col(0)) : -1;
-        return make_tuple(bestPValues.front().first, bestPValues[smallestSubsetSize].second, j, smallestSubsetSize, balancePValue); 
+        // compute balance p value in special case that only 1 covariate was needed
+        double balancePValue = -1;
+        if (smallestSubsetSize == 1 && !interceptTerm) {
+          balancePValue = testBalance(Z.col(bestColumns[1](1)), Z.col(0));
+        } else if (smallestSubsetSize == 1 && interceptTerm) {
+          balancePValue = testBalance(Z.col(bestColumns[1](2)), Z.col(0));
+        }
+        return make_tuple(bestPValues.front().first, bestPValues[smallestSubsetSize].second, 
+                          j, smallestSubsetSize, balancePValue, bestPValues[smallestSubsetSize].first); 
       }
     }    
   }  
-  return make_tuple(bestPValues.front().first, bestPValues.front().second, -1, -1, -1);
+  return make_tuple(bestPValues.front().first, bestPValues.front().second, -1, -1, -1, bestPValues.front().first);
 }

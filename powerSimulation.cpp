@@ -37,14 +37,14 @@ int main(int argc, char *argv[]) {
   normal_distribution<double> normalMean1(1, standardDeviation);  
 
   // store and print results
-  vector<tuple<double, double, int, int, double>> results(ITERATIONS); // p value, beta, set size, subset size
+  vector<tuple<double, double, int, int, double, double>> results(ITERATIONS); // initial p-value, "cheated" beta, set size, subset size, balance p-value, "cheated" p-value
   cout << setprecision(12) << fixed;
-  cout << "2N\tpower\tp.value\tbeta\tset.size\tsubset.size" << endl;
+  cout << "2N\tpower\tp.value\tbeta\tset.size\tsubset.size\tbalance.p.value\tfake.p.value" << endl;
   // randomly assign treatment
   vector<int> X(2*N); 
   for (int i = 0; i < N; ++i) X[i] = 1;  
   shuffle(X.begin() , X.end(), rng);  
-  arma::mat Z(2*N, 2*N - 1, arma::fill::zeros); // pre allocate Z matrix
+  arma::mat Z(2*N, 2*N, arma::fill::zeros); // pre allocate Z matrix
   for (int i = 0; i < ITERATIONS; ++i) {
     // generate response
     arma::Col<double> Y(2*N);
@@ -56,7 +56,9 @@ int main(int argc, char *argv[]) {
          << get<0>(results[i]) << '\t' 
          << get<1>(results[i]) << '\t' 
          << get<2>(results[i]) << '\t' 
-         << get<3>(results[i]) << endl;
+         << get<3>(results[i]) << '\t'
+         << get<4>(results[i]) << '\t'
+         << get<5>(results[i]) << endl;
   }
 
   double duration = (clock() - startTime) / (double) CLOCKS_PER_SEC;
