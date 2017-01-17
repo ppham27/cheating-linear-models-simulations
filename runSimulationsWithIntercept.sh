@@ -1,7 +1,11 @@
 #!/usr/bin/env sh
 
-./independentSimulation 1000 25 intercept > ../50_independent_beta_intercept.tsv
-./independentSimulation 1000 50 intercept > ../100_independent_beta_intercept.tsv
-./independentSimulation 1000 100 intercept > ../200_independent_beta_intercept.tsv
-./independentSimulation 1000 200 intercept > ../400_independent_beta_intercept.tsv
-# ./independentSimulation 1000 400 intercept > ../800_independent_beta_intercept.tsv
+OUT_DIR=analysis/output_data
+
+mkdir -p $OUT_DIR
+
+./independentSimulation 3000 25 intercept > $OUT_DIR/50_independent_beta_intercept.tsv
+./independentSimulation 3000 50 intercept > $OUT_DIR/100_independent_beta_intercept.tsv
+./independentSimulation 3000 100 intercept > $OUT_DIR/200_independent_beta_intercept.tsv
+./independentSimulation 3000 200 intercept > $OUT_DIR/400_independent_beta_intercept.tsv
+# ./independentSimulation 1000 400 intercept > $OUT_DIR/800_independent_beta_intercept.tsv
