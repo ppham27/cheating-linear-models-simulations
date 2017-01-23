@@ -28,7 +28,7 @@ mkdir -p $OUT_DIR
 # ./powerSimulation 1000 200 0.5 > $OUT_DIR/400_05_R_beta.tsv
 # ./powerSimulation 1000 400 0.5 > $OUT_DIR/800_05_R_beta.tsv
 
-# ./powerSimulation 1000 25 0.7 > $OUT_DIR/50_07_R_beta.tsv
+./powerSimulation 1000 25 0.7 > $OUT_DIR/50_07_R_beta.tsv
 # ./powerSimulation 1000 50 0.7 > $OUT_DIR/100_07_R_beta.tsv
 # ./powerSimulation 1000 100 0.7 > $OUT_DIR/200_07_R_beta.tsv
 # ./powerSimulation 1000 200 0.7 > $OUT_DIR/400_07_R_beta.tsv

@@ -16,13 +16,14 @@ Then, random vectors of 0s and 1s are generated, that is, each of the `2N` compo
 
 Each simulation returns the following data:
 
-- `2N`: 
-- `p.value`:
-- `beta`:
-- `set.size`:
-- `subset.size`:
-- `balance.p.value`:
-- `fake.p.value`:
+- `2N`: `N` is the number of observations in the treatment and the control group, so `2N` is the number of total observations.
+- `p.value`: A linear regression is done, `y = beta_x*x + epsilon` or `y = beta_x*x + beta_0 + epsilon` depending on if an intercept is used or not. Given a null hypothesis of `beta_x = 0`, this is the probability of getting an estimate of `beta_x` that is at least as large in absolute value as the estimate that we found.
+- `beta`: The estimate for `beta_x` from doing the linear regression.
+- `set.size`: The number of independent covariates generated before some subset of them could be used to fake statistical significance.
+- `subset.size`: The number of covariates used from that set to fake statistical significance.
+- `balance.p.value`: This is only generated in the case that that the subset size is 1. Call the one covariate in the subset `z`. We test if the covariate is evenly distributed among the treatment and control. This is modeled as a hypergeometric distribution. The total population size is `2N`. We make `N` draws from the population and assign them to the treatment. Assume `z` has `K` 1s. If there was perfect balance, both the treatment and control would have `K/2` 1s. Let `k` be the actual number of 1s in the treatment group, and let `k` be sampled from a random variable `X`. This number is the probability of assigning the treatment in a way that is just as unbalance or more unbalanced, that is, `Prob(X <= K/2 - |k - K/2|) + Prob(X >= K/2 + |k - K/2|)`.
+- `fake.p.value`: The the probability of getting an estimate of `beta_x` that is at least as large in absolute value as the estimate that we found when we include the subset of independent covariates that results in statistical significance.
+- `power`: This is only generated in power mode. This is the probability of being able to detect the effect of the treatment.
 
 
 ## Compiling
@@ -34,6 +35,8 @@ This should be as simple as running the command
 ## Generating the Data
 
 `runSimulations.sh` and `runSimulationsWithIntercept.sh` provide examples of how to run the program. As noted in the name of script `runSimulationsWithIntercept.sh` specifies that we run the simulation an intercept term, which is just an additional vector of 1s as a predictor.
+
+The first argument is the total number of simulations to be run. The second argument is `N`. For independent simulations, there is an optional third argument. If you pass `intercept` as the third argument, the linear regression will be run with an intercept term. For power simulations, the third argument is required. It should be a number between 0.05 and 1, which specifies the probability of detecting the effect of the treatment.
 
 ## Citations
 
