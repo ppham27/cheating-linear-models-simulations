@@ -43,7 +43,7 @@ The first argument is the total number of simulations to be run. The second argu
 There are two R scripts in the analysis folder to analyze the output of the data.
 
 - `analysisOfBalancePValues.R`: This script was used to generate data for *Model choice in experimental design: messy analyses of clean data* (Mutz, Pemantle, and Pham). Figures are generated showing the distribution of balance p-values when the a single independent covariate induces statistical significance.
-- `analysisOfSimulations.R`: This script was used to generate data for my master's thesis: Just How Easy is it to Cheat a Linear Regression? Several tables are generated and pretty printed that show the average number of covariates needed to get statistical significance.
+- `analysisOfSimulations.R`: This script was used to generate data for my master's thesis: *Just How Easy is it to Cheat a Linear Regression?* Several tables are generated and pretty printed that show the average number of covariates needed to get statistical significance.
 
 ## Citations
 
