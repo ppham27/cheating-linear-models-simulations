@@ -38,6 +38,13 @@ This should be as simple as running the command
 
 The first argument is the total number of simulations to be run. The second argument is `N`. For independent simulations, there is an optional third argument. If you pass `intercept` as the third argument, the linear regression will be run with an intercept term. For power simulations, the third argument is required. It should be a number between 0.05 and 1, which specifies the probability of detecting the effect of the treatment.
 
+## Analysis
+
+There are two R scripts in the analysis folder to analyze the output of the data.
+
+- `analysisOfBalancePValues.R`: This script was used to generate data for *Model choice in experimental design: messy analyses of clean data* (Mutz, Pemantle, and Pham). Figures are generated showing the distribution of balance p-values when the a single independent covariate induces statistical significance.
+- `analysisOfSimulations.R`: This script was used to generate data for my master's thesis: Just How Easy is it to Cheat a Linear Regression? Several tables are generated and pretty printed that show the average number of covariates needed to get statistical significance.
+
 ## Citations
 
 - 2002. The Boost Graph Library: User Guide and Reference Manual. Addison-Wesley Longman Publishing Co., Inc., Boston, MA, USA.

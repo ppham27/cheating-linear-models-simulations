@@ -4,10 +4,10 @@ OUT_DIR=analysis/output_data
 
 mkdir -p $OUT_DIR
 
-# ./independentSimulation 1000 25 > $OUT_DIR/50_independent_beta.tsv
+./independentSimulation 1000 25 > $OUT_DIR/50_independent_beta.tsv
 ./independentSimulation 1000 50 > $OUT_DIR/100_independent_beta.tsv
-# ./independentSimulation 1000 100 > $OUT_DIR/output_data/200_independent_beta.tsv
-# ./independentSimulation 1000 200 > $OUT_DIR/400_independent_beta.tsv
+./independentSimulation 1000 100 > $OUT_DIR/200_independent_beta.tsv
+./independentSimulation 1000 200 > $OUT_DIR/400_independent_beta.tsv
 # ./independentSimulation 1000 400 > $OUT_DIR/800_independent_beta.tsv
 
 # ./powerSimulation 1000 25 0.1 > $OUT_DIR/50_01_R_beta.tsv
