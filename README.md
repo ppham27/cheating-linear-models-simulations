@@ -5,6 +5,8 @@ various statistical simulations related to linear models.
 [Boost](http://www.boost.org/) is used to for the statistical distributions. 
 [Armadillo](http://arma.sourceforge.net/) is used for the linear algebra.
 
+The code was also used to run simulations for [The Perils of Balance Testing in Experimental Design: Messy Analyses of Clean Data](https://doi.org/10.1080/00031305.2017.1322143).
+
 Each simulation generates `2N` observations. `N` observations are assigned to the treatment group, and the remaining `N` observations are the control group. The treatment `x` is a vector of 0s and 1s, where 1 denotes the treatment group. The response variable `y` for each obervation is normally distributed with mean and variance depending on user parameters. A simple linear regression is run with `y` as the dependent variable and `x` as the independent variable.
 
 There are two possible modes:
@@ -49,4 +51,6 @@ There are two R scripts in the analysis folder to analyze the output of the data
 
 - 2002. The Boost Graph Library: User Guide and Reference Manual. Addison-Wesley Longman Publishing Co., Inc., Boston, MA, USA.
 - Conrad S. 2010. Armadillo: An open source C++ linear algebra library for fast prototyping and computationally intensive experiments. NICTA.
-
+- Diana C. Mutz, Robin Pemantle & Philip Pham (2019) The Perils of Balance
+Testing in Experimental Design: Messy Analyses of Clean Data, The American Statistician, 73:1,
+32-42, DOI: 10.1080/00031305.2017.1322143
